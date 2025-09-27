@@ -1,55 +1,28 @@
-require('dotenv').config();
-const nodemailer = require('nodemailer');
+// index.js
+const express = require('express');
+const path = require('path');
 
-// Create transporter
-let transporter = nodemailer.createTransport({
-  service: 'gmail', // or another SMTP service
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve static files from the "public" folder
+console.log(__dirname, "dirname");
+
+const publicDir = path.join(__dirname, 'client', 'public')
+
+app.use(express.static(publicDir));
+
+// Example API route
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from Express!' });
 });
 
-// Create email
-// Example questions
-const questions = [
-  {
-    question: "What is the capital of France?",
-    options: ["A) Paris", "B) London", "C) Rome", "D) Berlin"]
-  },
-  {
-    question: "2 + 2 = ?",
-    options: ["A) 3", "B) 4", "C) 5", "D) 22"]
-  }
-];
-
-// Build HTML for email
-let htmlBody = `
-  <h2>SpacedPeel Quiz</h2>
-  <p>Please reply to this email with your answers (e.g., Q1:A, Q2:B).</p>
-`;
-
-questions.forEach((q, index) => {
-  htmlBody += `<p><strong>Q${index + 1}: ${q.question}</strong><br>`;
-  q.options.forEach(option => {
-    htmlBody += `${option}<br>`;
-  });
-  htmlBody += `</p>`;
+// Fallback route to serve index.html for SPA
+app.get('/', (req, res) => {
+  res.sendFile(path.join(publicDir, 'landing.html'))
 });
 
-// Define email options
-let mailOptions = {
-  from: process.env.EMAIL_USER,
-  to: 'justin.cockrell1@gmail.com', // replace with your teacher's email
-  subject: 'Test Email from SpacedPeel',
-  html: htmlBody,
-};
-
-// Send email
-transporter.sendMail(mailOptions, (error, info) => {
-  if (error) {
-    console.log('Error:', error);
-  } else {
-    console.log('Email sent:', info.response);
-  }
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
