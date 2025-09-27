@@ -1,6 +1,8 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
+const questions = require("./server/data/questions.json")
+
 // Create transporter
 let transporter = nodemailer.createTransport({
   service: 'gmail', // or another SMTP service
@@ -11,37 +13,23 @@ let transporter = nodemailer.createTransport({
 });
 
 // Create email
-// Example questions
-const questions = [
-  {
-    question: "What is the capital of France?",
-    options: ["A) Paris", "B) London", "C) Rome", "D) Berlin"]
-  },
-  {
-    question: "2 + 2 = ?",
-    options: ["A) 3", "B) 4", "C) 5", "D) 22"]
-  }
-];
+const email = process.argv[2];
+const questionIndex = process.argv[3];
+const API_URL = process.env.API_URL
 
 // Build HTML for email
 let htmlBody = `
-  <h2>SpacedPeel Quiz</h2>
-  <p>Please reply to this email with your answers (e.g., Q1:A, Q2:B).</p>
+  <h2>Here's your Banana 🍌</h2>
+  <a href="${API_URL}/response/${questionIndex}"><button>Answer</button></a>
 `;
 
-questions.forEach((q, index) => {
-  htmlBody += `<p><strong>Q${index + 1}: ${q.question}</strong><br>`;
-  q.options.forEach(option => {
-    htmlBody += `${option}<br>`;
-  });
-  htmlBody += `</p>`;
-});
+
 
 // Define email options
 let mailOptions = {
   from: process.env.EMAIL_USER,
-  to: 'justin.cockrell1@gmail.com', // replace with your teacher's email
-  subject: 'Test Email from SpacedPeel',
+  to: email, // replace with your teacher's email
+  subject: "New Banana from SpacedPeel 🍌",
   html: htmlBody,
 };
 

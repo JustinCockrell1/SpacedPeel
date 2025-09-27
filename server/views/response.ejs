@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SpacedPeel Question</title>
+</head>
+<body>
+  <h1>Question</h1>
+  <p><%= question.text %></p>
+  <form id="quizForm">
+    <% question.answers.forEach(answer => { %>
+      <div>
+        <input 
+          type="radio" 
+          name="selectedAnswer" 
+          value="<%= answer %>" 
+          id="<%= answer %>"
+          required
+        >
+        <label for="<%= answer %>"><%= answer %></label>
+      </div>
+    <% }) %>
+
+    <!-- You can include the correct answer for demo or tracking purposes if needed -->
+    <input type="hidden" name="correctAnswer" value="<%= question.correct %>">
+
+    <button type="submit">Submit Answer</button>
+  </form>
+
+  <!-- Optional: Show correct answer for demo purposes -->
+  <p id="feedback"></p>
+
+  <script defer>
+const form = document.getElementById('quizForm');
+const feedback = document.getElementById('feedback');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+
+  const res = await fetch('/response', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+  console.log(result);
+  
+  feedback.textContent = result.message;
+  feedback.style.color = result.isCorrect ? 'green' : 'red';
+  form.reset()
+});
+</script>
+</body>
+</html>
